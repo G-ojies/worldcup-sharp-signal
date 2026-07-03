@@ -30,25 +30,48 @@ export function ProbabilityChart({
 
   const px = (t: number) => PAD.left + ((t - t0) / span) * (W - PAD.left - PAD.right);
   const py = (pct: number) => PAD.top + (1 - pct / 100) * (H - PAD.top - PAD.bottom);
+  const baseY = py(0);
 
   const visible = series.slice(0, Math.max(2, playIdx + 1));
-  const line = (key: "p1" | "draw" | "p2") =>
+  const pts = (key: "p1" | "draw" | "p2") =>
     visible.map((p) => `${px(p.t).toFixed(1)},${py(p[key]).toFixed(1)}`).join(" ");
+
+  // area polygon under the home line
+  const areaPts =
+    visible.map((p) => `${px(p.t).toFixed(1)},${py(p.p1).toFixed(1)}`).join(" ") +
+    ` ${px(visible[visible.length - 1]!.t).toFixed(1)},${baseY} ${px(visible[0]!.t).toFixed(1)},${baseY}`;
 
   const playT = series[Math.min(playIdx, series.length - 1)]!.t;
   const playX = px(playT);
-
-  // kickoff marker: first in-running point
+  const playY = py(series[Math.min(playIdx, series.length - 1)]!.p1);
   const kickoff = series.find((p) => p.inRunning);
 
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
-      className="w-full h-auto"
+      className="h-auto w-full"
       role="img"
       aria-label={`Implied probability over time for ${meta.home} versus ${meta.away}`}
     >
-      {/* horizontal gridlines every 25% */}
+      <defs>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="hsl(190 95% 55%)" />
+          <stop offset="100%" stopColor="hsl(265 90% 66%)" />
+        </linearGradient>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="hsl(190 95% 55%)" stopOpacity="0.30" />
+          <stop offset="100%" stopColor="hsl(190 95% 55%)" stopOpacity="0" />
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* gridlines */}
       {[0, 25, 50, 75, 100].map((g) => (
         <g key={g}>
           <line x1={PAD.left} x2={W - PAD.right} y1={py(g)} y2={py(g)} stroke="hsl(var(--border))" strokeWidth={1} />
@@ -58,36 +81,37 @@ export function ProbabilityChart({
         </g>
       ))}
 
-      {/* kickoff divider */}
       {kickoff && (
         <g>
-          <line x1={px(kickoff.t)} x2={px(kickoff.t)} y1={PAD.top} y2={H - PAD.bottom} stroke="hsl(var(--border))" strokeDasharray="3 4" strokeWidth={1} />
-          <text x={px(kickoff.t) + 4} y={H - PAD.bottom - 6} fill="hsl(var(--muted))" fontSize={10}>
+          <line x1={px(kickoff.t)} x2={px(kickoff.t)} y1={PAD.top} y2={baseY} stroke="hsl(var(--border))" strokeDasharray="3 4" strokeWidth={1} />
+          <text x={px(kickoff.t) + 4} y={baseY - 6} fill="hsl(var(--muted))" fontSize={10}>
             kickoff
           </text>
         </g>
       )}
 
-      {/* probability lines */}
-      <polyline points={line("p2")} fill="none" stroke="hsl(var(--muted))" strokeWidth={1.5} opacity={0.7} />
-      <polyline points={line("draw")} fill="none" stroke="hsl(var(--border))" strokeWidth={1.5} opacity={0.9} />
-      <polyline points={line("p1")} fill="none" stroke="hsl(var(--accent))" strokeWidth={2.5} />
+      {/* area + lines */}
+      <polygon points={areaPts} fill="url(#areaGrad)" />
+      <polyline points={pts("p2")} fill="none" stroke="hsl(var(--muted))" strokeWidth={1.5} opacity={0.65} />
+      <polyline points={pts("draw")} fill="none" stroke="hsl(var(--border))" strokeWidth={1.5} opacity={0.9} />
+      <polyline points={pts("p1")} fill="none" stroke="url(#lineGrad)" strokeWidth={2.75} strokeLinejoin="round" strokeLinecap="round" filter="url(#glow)" />
 
-      {/* signal markers (only those the playhead has reached) */}
+      {/* signal markers reached by the playhead */}
       {signals
         .filter((s) => s.tsMs <= playT + 1)
-        .map((s, i) => {
-          return (
-            <g key={i}>
-              <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={5} fill={proofColor(s.proofStatus)} stroke="hsl(var(--bg))" strokeWidth={2} />
-              <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={9} fill="none" stroke={proofColor(s.proofStatus)} strokeWidth={1} opacity={0.4} />
-            </g>
-          );
-        })}
+        .map((s, i) => (
+          <g key={i} filter="url(#glow)">
+            <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={5.5} fill={proofColor(s.proofStatus)} stroke="hsl(var(--bg))" strokeWidth={2} />
+            <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={11} fill="none" stroke={proofColor(s.proofStatus)} strokeWidth={1} opacity={0.35}>
+              <animate attributeName="r" values="9;15;9" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.4;0;0.4" dur="1.8s" repeatCount="indefinite" />
+            </circle>
+          </g>
+        ))}
 
       {/* playhead */}
-      <line x1={playX} x2={playX} y1={PAD.top} y2={H - PAD.bottom} stroke="hsl(var(--accent))" strokeWidth={1} opacity={0.5} />
-      <circle cx={playX} cy={py(series[Math.min(playIdx, series.length - 1)]!.p1)} r={3.5} fill="hsl(var(--accent))" />
+      <line x1={playX} x2={playX} y1={PAD.top} y2={baseY} stroke="hsl(var(--accent))" strokeWidth={1} opacity={0.5} />
+      <circle cx={playX} cy={playY} r={4} fill="hsl(var(--accent))" filter="url(#glow)" />
     </svg>
   );
 }
