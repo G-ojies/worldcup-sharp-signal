@@ -1,12 +1,12 @@
 # Uploading the demo video to YouTube
 
-The finished explainer is at **`~/Videos/greyat-sharpsignal-explainer-1080p.mp4`** (1080p, ~4¼ min, narrated).
+The finished explainer is at **`~/Videos/greyat-sharpsignal-explainer-FINAL-1080p.mp4`** (1080p, ~4¼ min, narrated).
 Other cuts in `~/Videos/`: `…-1080p-voiced.mp4` (short 32s voiced), `…-1080p.mp4` (short silent).
 
 ## Steps
 
 1. Go to **studio.youtube.com** (or youtube.com → **Create ▸ Upload video**) and sign in.
-2. Click **Create ▸ Upload videos**, choose `~/Videos/greyat-sharpsignal-explainer-1080p.mp4`.
+2. Click **Create ▸ Upload videos**, choose `~/Videos/greyat-sharpsignal-explainer-FINAL-1080p.mp4`.
 3. **Title** — paste:
    ```
    GreYat SharpSignal — Autonomous World Cup Trading Agent (TxLINE + Solana)
@@ -26,7 +26,7 @@ Other cuts in `~/Videos/`: `…-1080p-voiced.mp4` (short 32s voiced), `…-1080p
    ```
 5. **Visibility** — **Unlisted** is fine for a hackathon (anyone with the link can view; not in search). Use **Public** if you want it discoverable. Do NOT use Private (judges couldn't open it).
 6. (Optional) **Thumbnail** — upload `~/Videos` frame or the title card; you can grab one with:
-   `ffmpeg -ss 2 -i ~/Videos/greyat-sharpsignal-explainer-1080p.mp4 -frames:v 1 ~/Videos/thumb.png`
+   `ffmpeg -ss 2 -i ~/Videos/greyat-sharpsignal-explainer-FINAL-1080p.mp4 -frames:v 1 ~/Videos/thumb.png`
 7. Click through **Next** (no need to set "made for kids" → select **No, it's not made for kids**), then **Publish** (or **Save** for unlisted).
 8. Copy the video link (e.g. `https://youtu.be/…`).
 
