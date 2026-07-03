@@ -74,7 +74,10 @@ export default function Page() {
   }, [runState, run]);
 
   const playT = run && run.series.length ? run.series[Math.min(playIdx, run.series.length - 1)]!.t : 0;
-  const revealed = useMemo(() => (run ? run.events.filter((e) => e.tsMs <= playT + 1) : []), [run, playT]);
+  const atEnd = run ? playIdx >= run.series.length - 1 : false;
+  // Reveal by match time; once the playhead reaches the whistle, reveal everything
+  // (settlement carries a wall-clock timestamp beyond the match series).
+  const revealed = useMemo(() => (run ? run.events.filter((e) => atEnd || e.tsMs <= playT + 1) : []), [run, playT, atEnd]);
   const signals = useMemo(() => (run ? run.events.filter((e): e is Extract<RunEvent, { type: "signal" }> => e.type === "signal") : []), [run]);
 
   return (
