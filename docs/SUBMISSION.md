@@ -16,7 +16,7 @@ Close: **2026-07-19 23:59 UTC**
 
 **Public repo:** https://github.com/G-ojies/worldcup-sharp-signal
 
-**Demo video:** _<paste Loom/YouTube link — script in `docs/DEMO_SCRIPT.md`>_
+**Demo video:** https://youtu.be/0bxquNOPjxg
 
 **Brief technical documentation:** see `TECHNICAL.md` (architecture, signal math, on-chain verification, endpoints).
 
@@ -43,4 +43,4 @@ Close: **2026-07-19 23:59 UTC**
 - [x] Working deployed link
 - [x] Brief technical documentation
 - [x] API feedback
-- [ ] Demo video (≤5 min) — **record before submitting**
+- [x] Demo video (≤5 min) — https://youtu.be/0bxquNOPjxg
