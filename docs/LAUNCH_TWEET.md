@@ -1,24 +1,23 @@
-# Launch tweet options
+# Launch tweet
 
-Primary (≈277 chars incl. link — fits 280):
+## Primary (post this — ~278 chars, fits 280)
 
-> ⚡ GreYat SharpSignal — an autonomous agent for the TxLINE World Cup hackathon.
+> ⚡ GreYat SharpSignal — for the @SuperteamEarn World Cup hackathon.
 >
-> It catches sharp odds moves in real time, proves each one on Solana (validate_odds) *before* it trades, then grades itself at the whistle.
+> An autonomous agent that reads live TxLINE odds, catches steam moves, and verifies each on @solana (validate_odds) before trading — then self-grades at the whistle.
 >
-> Verify-before-trade for sports markets. Live 👇
-> https://worldcup-sharp-signal.vercel.app
+> 3/3 on a real match 👇
+> https://youtu.be/SxCgfMbxdoE
 
-Punchier alt:
+## Reply (thread continuation)
 
-> Most trading bots act on data they can't prove is real.
+> Live app (try it — run the agent on a real match): https://worldcup-sharp-signal.vercel.app
 >
-> ⚡ GreYat SharpSignal won't. It reads live TxLINE World Cup odds, catches the steam, and verifies every update on Solana before it moves — then settles itself.
+> Open source: https://github.com/G-ojies/worldcup-sharp-signal
 >
-> Autonomous. On-chain-verified. Live 👇
-> https://worldcup-sharp-signal.vercel.app
+> Built on TxLINE StablePrice + Solana. Verify-before-trade for sports markets.
 
-Notes:
-- Add the sponsor/community @handles (TxODDS / Superteam) if you know them — good for reach.
-- Attach a 5–10s screen clip of the run (chart surge + WON positions) for engagement.
-- Repo: https://github.com/G-ojies/worldcup-sharp-signal
+## Notes
+- `@SuperteamEarn` and `@solana` are the correct handles. Add **TxODDS's** X handle if you know it (couldn't verify it — don't guess/mis-tag).
+- Attach a short clip of the run (chart surge + WON positions) for more reach, or let the YouTube link auto-embed.
+- After posting, paste the tweet URL into the submission's **Tweet Link** field.
