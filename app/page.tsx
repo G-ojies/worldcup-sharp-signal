@@ -119,7 +119,7 @@ export default function Page() {
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div className="space-y-4 lg:col-span-2">
             <Reveal show from="up" delay={TIMING.chart}>
-              <ChartCard run={run} runState={runState} runError={runError} playIdx={playIdx} signals={signals} onRun={startRun} />
+              <ChartCard run={run} runState={runState} runError={runError} playIdx={playIdx} signals={signals} onRun={startRun} instant={instant} />
             </Reveal>
             <Reveal show from="up" delay={TIMING.tape}>
               <SignalTape run={run} revealed={revealed} />
@@ -148,7 +148,9 @@ function Header({ runState, onRun }: { runState: RunState; onRun: () => void }) 
       <div>
         <div className="flex items-center gap-2">
           <span className="text-2xl leading-none">⚡</span>
-          <h1 className="text-gradient text-2xl font-bold tracking-tight">SharpSignal</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            <span className="text-fg">GreYat</span> <span className="text-gradient">SharpSignal</span>
+          </h1>
           <span className="rounded-full border border-accent/30 bg-accent/5 px-2 py-0.5 text-[11px] text-accent">World Cup · TxLINE</span>
         </div>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
@@ -179,6 +181,7 @@ function ChartCard({
   playIdx,
   signals,
   onRun,
+  instant,
 }: {
   run: RunResponse | null;
   runState: RunState;
@@ -186,6 +189,7 @@ function ChartCard({
   playIdx: number;
   signals: Extract<RunEvent, { type: "signal" }>[];
   onRun: () => void;
+  instant: boolean;
 }) {
   return (
     <div className="card p-4 sm:p-5">
@@ -200,7 +204,7 @@ function ChartCard({
       {runState === "loading" && <ChartSkeleton />}
       {runState === "error" && <ErrorState msg={runError} onRun={onRun} />}
       {run && (runState === "playing" || runState === "done") && (
-        <ProbabilityChart series={run.series} playIdx={playIdx} signals={signals} meta={run.meta} />
+        <ProbabilityChart series={run.series} playIdx={playIdx} signals={signals} meta={run.meta} instant={instant} />
       )}
     </div>
   );

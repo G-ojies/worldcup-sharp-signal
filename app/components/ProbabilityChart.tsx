@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { RunMeta, RunEvent, SeriesPoint } from "../lib/types";
 
 const W = 1000;
@@ -17,12 +18,23 @@ export function ProbabilityChart({
   playIdx,
   signals,
   meta,
+  instant = false,
 }: {
   series: SeriesPoint[];
   playIdx: number;
   signals: Extract<RunEvent, { type: "signal" }>[];
   meta: RunMeta;
+  /** true when the run jumps straight to the end (autorun/reduced-motion) — the
+   *  home line then draws itself in with a stroke-dashoffset sweep. */
+  instant?: boolean;
 }) {
+  // Trigger the one-shot draw-on the frame after mount (so the CSS transition runs).
+  const [drawn, setDrawn] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   if (series.length < 2) return null;
   const t0 = series[0]!.t;
   const t1 = series[series.length - 1]!.t;
@@ -35,6 +47,8 @@ export function ProbabilityChart({
   const visible = series.slice(0, Math.max(2, playIdx + 1));
   const pts = (key: "p1" | "draw" | "p2") =>
     visible.map((p) => `${px(p.t).toFixed(1)},${py(p[key]).toFixed(1)}`).join(" ");
+  const fullPts = (key: "p1" | "draw" | "p2") =>
+    series.map((p) => `${px(p.t).toFixed(1)},${py(p[key]).toFixed(1)}`).join(" ");
 
   // area polygon under the home line
   const areaPts =
@@ -94,7 +108,25 @@ export function ProbabilityChart({
       <polygon points={areaPts} fill="url(#areaGrad)" />
       <polyline points={pts("p2")} fill="none" stroke="hsl(var(--muted))" strokeWidth={1.5} opacity={0.65} />
       <polyline points={pts("draw")} fill="none" stroke="hsl(var(--border))" strokeWidth={1.5} opacity={0.9} />
-      <polyline points={pts("p1")} fill="none" stroke="url(#lineGrad)" strokeWidth={2.75} strokeLinejoin="round" strokeLinecap="round" filter="url(#glow)" />
+      {instant ? (
+        // full line, revealed by a stroke-dashoffset sweep on mount
+        <polyline
+          points={fullPts("p1")}
+          fill="none"
+          stroke="url(#lineGrad)"
+          strokeWidth={2.75}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          filter="url(#glow)"
+          pathLength={1}
+          strokeDasharray={1}
+          strokeDashoffset={drawn ? 0 : 1}
+          style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+        />
+      ) : (
+        // playback: line grows point-by-point with the playhead
+        <polyline points={pts("p1")} fill="none" stroke="url(#lineGrad)" strokeWidth={2.75} strokeLinejoin="round" strokeLinecap="round" filter="url(#glow)" />
+      )}
 
       {/* signal markers reached by the playhead */}
       {signals
