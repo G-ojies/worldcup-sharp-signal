@@ -50,6 +50,11 @@ export async function GET() {
 
   // Downsample the probability series for the client chart (~200 points).
   const odds = bundle.odds.filter((o) => Array.isArray(o.Pct) && o.Pct.length >= 3).sort((a, b) => a.Ts - b.Ts);
+
+  // Settlement happens at wall-clock time; re-anchor settle events to the match's
+  // final tick so the time-based playhead reveals them (as WON/LOST) at the end.
+  const finalTs = odds.length ? odds[odds.length - 1]!.Ts : 0;
+  for (const e of events) if (e.type === "settle") e.tsMs = finalTs;
   const stride = Math.max(1, Math.floor(odds.length / 200));
   const series = odds
     .filter((_, i) => i % stride === 0)
