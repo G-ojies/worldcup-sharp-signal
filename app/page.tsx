@@ -147,10 +147,14 @@ function Header({ runState, onRun }: { runState: RunState; onRun: () => void }) 
     <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <div className="flex items-center gap-2">
-          <span className="text-2xl leading-none">⚡</span>
-          <h1 className="text-2xl font-bold tracking-tight">
-            <span className="text-fg">GreYat</span> <span className="text-gradient">SharpSignal</span>
-          </h1>
+          <motion.span
+            className="text-2xl leading-none"
+            animate={{ scale: [1, 1.15, 1], filter: ["drop-shadow(0 0 0 transparent)", "drop-shadow(0 0 8px hsl(190 95% 55%))", "drop-shadow(0 0 0 transparent)"] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            ⚡
+          </motion.span>
+          <h1 className="text-gradient-animated text-2xl font-bold tracking-tight">GreYat SharpSignal</h1>
           <span className="rounded-full border border-accent/30 bg-accent/5 px-2 py-0.5 text-[11px] text-accent">World Cup · TxLINE</span>
         </div>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
