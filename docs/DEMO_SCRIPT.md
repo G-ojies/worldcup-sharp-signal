@@ -1,4 +1,4 @@
-# SharpSignal — 5-minute demo script
+# GreYat SharpSignal — 5-minute demo script
 
 **Live:** https://worldcup-sharp-signal.vercel.app · **Repo:** https://github.com/G-ojies/worldcup-sharp-signal
 
@@ -7,7 +7,7 @@ Goal: show a working autonomous agent that ingests TxLINE data, detects sharp mo
 ---
 
 ### 0:00 — Hook (20s)
-> "Sharp money moves the market before the crowd catches up. SharpSignal is an autonomous agent that watches the TxLINE World Cup odds, catches those steam moves the moment they happen, and — the part that matters for a trading desk — proves every move is real TxLINE data anchored on Solana before it acts on it."
+> "Sharp money moves the market before the crowd catches up. GreYat SharpSignal is an autonomous agent that watches the TxLINE World Cup odds, catches those steam moves the moment they happen, and — the part that matters for a trading desk — proves every move is real TxLINE data anchored on Solana before it acts on it."
 
 Open the live dashboard. Point at the **Live TxLINE feed** panel (real fixtures loading) — "this is live TxLINE data, right now."
 

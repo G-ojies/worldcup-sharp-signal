@@ -1,4 +1,4 @@
-# SharpSignal — demo video script (word-for-word)
+# GreYat SharpSignal — demo video script (word-for-word)
 
 **Target: 4:30** (hard cap 5:00) · screen recording + voiceover · **audio on, confirm before submitting.**
 
@@ -15,7 +15,7 @@ Read the **VOICEOVER** column aloud. The **SCREEN** column is what you do. Times
 **SCREEN:** Dashboard open at the top, not yet run. Slowly move the cursor to the *Live TxLINE feed* panel.
 
 **VOICEOVER:**
-> "In betting markets, the sharp money moves the line before the crowd knows why. This is SharpSignal — an autonomous agent that watches the World Cup odds on TxLINE, catches those sharp moves the instant they happen, and — the part a trading desk actually cares about — proves every move is real, on-chain-anchored data *before* it acts on it. Everything you're seeing here is the live TxLINE feed, right now."
+> "In betting markets, the sharp money moves the line before the crowd knows why. This is GreYat SharpSignal — an autonomous agent that watches the World Cup odds on TxLINE, catches those sharp moves the instant they happen, and — the part a trading desk actually cares about — proves every move is real, on-chain-anchored data *before* it acts on it. Everything you're seeing here is the live TxLINE feed, right now."
 
 ---
 

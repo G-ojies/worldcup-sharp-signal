@@ -5,7 +5,7 @@ Close: **2026-07-19 23:59 UTC**
 
 ---
 
-**Project name:** SharpSignal
+**Project name:** GreYat SharpSignal
 
 **One-liner:** An autonomous, proof-grounded sharp-money detector for the World Cup — it streams the TxLINE StablePrice feed, flags steam moves with a deterministic z-score signal, proves each update on Solana via `validate_odds` before acting, and self-grades against the final score.
 

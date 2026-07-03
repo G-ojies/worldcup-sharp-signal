@@ -1,4 +1,4 @@
-# SharpSignal — Technical Overview
+# GreYat SharpSignal — Technical Overview
 
 **Live:** https://worldcup-sharp-signal.vercel.app · **Repo:** https://github.com/G-ojies/worldcup-sharp-signal
 

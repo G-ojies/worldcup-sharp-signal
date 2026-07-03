@@ -1,4 +1,4 @@
-# ⚡ SharpSignal
+# ⚡ GreYat SharpSignal
 
 **An autonomous, proof-grounded sharp-money detector for the 2026 World Cup — powered by the TxLINE StablePrice feed and settled on Solana.**
 
@@ -8,7 +8,7 @@ Built for the TxODDS **Trading Tools and Agents** track (World Cup hackathon on 
 
 ## What it does
 
-SharpSignal is a fully autonomous agent. Once started it takes **no human input**:
+GreYat SharpSignal is a fully autonomous agent. Once started it takes **no human input**:
 
 ```
  TxLINE StablePrice feed (SSE)

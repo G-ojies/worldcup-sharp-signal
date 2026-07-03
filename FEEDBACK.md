@@ -1,6 +1,6 @@
 # TxLINE API — builder feedback
 
-Our experience integrating TxLINE for SharpSignal (Trading Tools and Agents track).
+Our experience integrating TxLINE for GreYat SharpSignal (Trading Tools and Agents track).
 
 ## What worked really well
 
