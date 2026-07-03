@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark "trading terminal" palette. All hues in HSL channels for Tailwind. */
+  --bg: 222 24% 6%;
+  --panel: 222 20% 9%;
+  --panel-2: 222 18% 12%;
+  --border: 222 14% 18%;
+  --fg: 210 20% 92%;
+  --muted: 214 12% 55%;
+  --accent: 190 95% 55%; /* cyan — signals/brand */
+  --pos: 152 62% 47%; /* green — wins / prob up */
+  --neg: 353 78% 60%; /* red — losses */
+  --warn: 42 96% 58%; /* amber — advisory / pending proof */
+
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: hsl(var(--bg));
+  color: hsl(var(--fg));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numeric/tabular data reads better monospaced and figure-aligned. */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* subtle scrollbars for the data panes */
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 8px;
+}

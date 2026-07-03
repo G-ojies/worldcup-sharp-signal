@@ -1,0 +1,38 @@
+{
+  "name": "worldcup-sharp-signal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Autonomous, proof-grounded sharp-money detector for the 2026 World Cup, powered by the TxLINE StablePrice feed and settled on Solana.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "agent": "tsx src/index.ts",
+    "agent:mock": "SHARP_FEED=mock tsx src/index.ts",
+    "agent:replay": "SHARP_FEED=replay tsx src/index.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/web3.js": "^1.98.4",
+    "dotenv": "^16.4.5",
+    "next": "^14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
