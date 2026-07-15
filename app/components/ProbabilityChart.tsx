@@ -68,21 +68,10 @@ export function ProbabilityChart({
       aria-label={`Implied probability over time for ${meta.home} versus ${meta.away}`}
     >
       <defs>
-        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="hsl(190 95% 55%)" />
-          <stop offset="100%" stopColor="hsl(265 90% 66%)" />
-        </linearGradient>
         <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="hsl(190 95% 55%)" stopOpacity="0.30" />
-          <stop offset="100%" stopColor="hsl(190 95% 55%)" stopOpacity="0" />
+          <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0" />
         </linearGradient>
-        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
 
       {/* gridlines */}
@@ -107,17 +96,16 @@ export function ProbabilityChart({
       {/* area + lines */}
       <polygon points={areaPts} fill="url(#areaGrad)" />
       <polyline points={pts("p2")} fill="none" stroke="hsl(var(--muted))" strokeWidth={1.5} opacity={0.65} />
-      <polyline points={pts("draw")} fill="none" stroke="hsl(var(--border))" strokeWidth={1.5} opacity={0.9} />
+      <polyline points={pts("draw")} fill="none" stroke="hsl(var(--border-strong))" strokeWidth={1.5} />
       {instant ? (
         // full line, revealed by a stroke-dashoffset sweep on mount
         <polyline
           points={fullPts("p1")}
           fill="none"
-          stroke="url(#lineGrad)"
-          strokeWidth={2.75}
+          stroke="hsl(var(--accent))"
+          strokeWidth={2.25}
           strokeLinejoin="round"
           strokeLinecap="round"
-          filter="url(#glow)"
           pathLength={1}
           strokeDasharray={1}
           strokeDashoffset={drawn ? 0 : 1}
@@ -125,25 +113,25 @@ export function ProbabilityChart({
         />
       ) : (
         // playback: line grows point-by-point with the playhead
-        <polyline points={pts("p1")} fill="none" stroke="url(#lineGrad)" strokeWidth={2.75} strokeLinejoin="round" strokeLinecap="round" filter="url(#glow)" />
+        <polyline points={pts("p1")} fill="none" stroke="hsl(var(--accent))" strokeWidth={2.25} strokeLinejoin="round" strokeLinecap="round" />
       )}
 
       {/* signal markers reached by the playhead */}
       {signals
         .filter((s) => s.tsMs <= playT + 1)
         .map((s, i) => (
-          <g key={i} filter="url(#glow)">
-            <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={5.5} fill={proofColor(s.proofStatus)} stroke="hsl(var(--bg))" strokeWidth={2} />
-            <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={11} fill="none" stroke={proofColor(s.proofStatus)} strokeWidth={1} opacity={0.35}>
-              <animate attributeName="r" values="9;15;9" dur="1.8s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.4;0;0.4" dur="1.8s" repeatCount="indefinite" />
+          <g key={i}>
+            <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={4.5} fill={proofColor(s.proofStatus)} stroke="hsl(var(--panel))" strokeWidth={2} />
+            <circle cx={px(s.tsMs)} cy={py(s.probAfter)} r={9} fill="none" stroke={proofColor(s.proofStatus)} strokeWidth={1} opacity={0.3}>
+              <animate attributeName="r" values="7;13;7" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.35;0;0.35" dur="1.8s" repeatCount="indefinite" />
             </circle>
           </g>
         ))}
 
       {/* playhead */}
-      <line x1={playX} x2={playX} y1={PAD.top} y2={baseY} stroke="hsl(var(--accent))" strokeWidth={1} opacity={0.5} />
-      <circle cx={playX} cy={playY} r={4} fill="hsl(var(--accent))" filter="url(#glow)" />
+      <line x1={playX} x2={playX} y1={PAD.top} y2={baseY} stroke="hsl(var(--accent))" strokeWidth={1} opacity={0.4} />
+      <circle cx={playX} cy={playY} r={3.5} fill="hsl(var(--accent))" stroke="hsl(var(--panel))" strokeWidth={2} />
     </svg>
   );
 }

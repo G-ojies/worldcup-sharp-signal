@@ -23,6 +23,7 @@ export function AnimatedNumber({
   suffix = "",
   signed = false,
   delay = 0,
+  duration = 0.9,
   className,
 }: {
   value: number;
@@ -31,6 +32,8 @@ export function AnimatedNumber({
   suffix?: string;
   signed?: boolean;
   delay?: number;
+  /** Shorten for counters that chase a playhead, so they don't lag behind it. */
+  duration?: number;
   className?: string;
 }) {
   const reduce = useReducedMotion();
@@ -45,9 +48,9 @@ export function AnimatedNumber({
       mv.set(value);
       return;
     }
-    const controls = animate(mv, value, { duration: 0.9, delay, ease: EASE_OUT_EXPO });
+    const controls = animate(mv, value, { duration, delay, ease: EASE_OUT_EXPO });
     return controls.stop;
-  }, [value, delay, reduce, mv]);
+  }, [value, delay, duration, reduce, mv]);
 
   return <motion.span className={className}>{text}</motion.span>;
 }

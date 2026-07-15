@@ -3,26 +3,37 @@
 @tailwind utilities;
 
 :root {
-  /* Dark "trading terminal" palette, richer + gradient-ready. HSL channels. */
-  --bg: 224 32% 5%;
-  --bg-2: 226 30% 7%;
-  --panel: 225 26% 9%;
-  --panel-2: 225 22% 13%;
-  --border: 225 18% 18%;
-  --fg: 210 30% 95%;
-  --muted: 220 14% 60%;
+  /* Flat editorial dark palette. Surfaces are warm-neutral (hue 40, low sat) so
+   * they sit under the cream foreground without going muddy; violet is the only
+   * chromatic accent. HSL channels. */
+  --bg: 40 6% 4%;
+  --bg-2: 40 6% 5%;
+  --panel: 40 5% 7%;
+  --panel-2: 40 5% 11%;
+  --border: 40 5% 15%;
+  --border-strong: 40 5% 22%;
+  --fg: 40 20% 91%; /* cream — never pure white, avoids glare on near-black */
+  --muted: 40 6% 58%; /* 6.5:1 on --bg, passes AA at small sizes */
 
-  --accent: 190 95% 55%; /* cyan — primary/brand */
-  --accent-2: 265 90% 66%; /* violet — secondary/brand */
-  --pos: 152 66% 48%; /* green — wins / prob up */
-  --neg: 353 82% 62%; /* red — losses */
-  --warn: 40 96% 58%; /* amber — advisory / pending proof */
+  /* Violet — the one accent. L=64 is the value that satisfies both of its jobs:
+   * white-on-violet button text hits 5.26:1 (AA body), and violet-on-near-black
+   * hits 3.76:1 (AA for the graphics it's used as — dots, chart line, focus
+   * ring). Lightening it to 68 would push white-on-violet down to 4.35 and fail.
+   * It is never used as body text. */
+  --accent: 252 100% 64%;
+  --accent-fg: 0 0% 100%;
+  --cream: 40 22% 89%; /* primary CTA fill (dark text on cream) */
 
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --pos: 145 58% 55%; /* won / prob up */
+  --neg: 2 70% 62%; /* lost */
+  --warn: 38 88% 60%; /* advisory / proof pending */
 
-  --grad-brand: linear-gradient(135deg, hsl(190 95% 55%), hsl(265 90% 66%));
-  --grad-pos: linear-gradient(135deg, hsl(160 70% 50%), hsl(190 95% 55%));
+  --radius: 14px;
+  --radius-sm: 8px;
+
+  /* Bridged from the geist package's next/font variables (set in layout.tsx). */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 * {
@@ -35,76 +46,59 @@ html {
 
 body {
   color: hsl(var(--fg));
+  background: hsl(var(--bg));
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  /* layered ambient glows over a deep base */
-  background:
-    radial-gradient(900px 500px at 12% -8%, hsl(190 95% 55% / 0.10), transparent 60%),
-    radial-gradient(1000px 600px at 100% 0%, hsl(265 90% 66% / 0.12), transparent 55%),
-    linear-gradient(hsl(var(--bg)), hsl(var(--bg-2)));
-  background-attachment: fixed;
   min-height: 100vh;
 }
 
-.tnum {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-.text-gradient {
-  background: var(--grad-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* flowing multi-stop gradient for the brand wordmark */
-.text-gradient-animated {
-  background: linear-gradient(
-    90deg,
-    hsl(190 95% 58%),
-    hsl(265 90% 68%),
-    hsl(322 90% 66%),
-    hsl(265 90% 68%),
-    hsl(190 95% 58%)
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: gradient-flow 6s linear infinite;
-}
-@keyframes gradient-flow {
-  to {
-    background-position: -200% center;
+/* These live in the components layer so Tailwind utilities (emitted in the later
+ * utilities layer) still win — `label text-pos` and `stat text-neg` override the
+ * defaults below without needing `!important`. */
+@layer components {
+  /* Monospace micro-label — the recurring "LIVE OPPORTUNITIES" / "REWARDS"
+   * device. 11px is the floor for reliable cross-platform rendering. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--muted));
   }
-}
 
-/* frosted card with a hairline top highlight */
-.card {
-  background: linear-gradient(hsl(var(--panel) / 0.9), hsl(var(--panel) / 0.7));
-  border: 1px solid hsl(var(--border));
-  border-radius: 14px;
-  backdrop-filter: blur(6px);
-  position: relative;
-}
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(var(--fg) / 0.14), transparent);
-  border-radius: 14px 14px 0 0;
-}
+  .tnum {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
 
-.glow-accent {
-  box-shadow: 0 0 0 1px hsl(var(--accent) / 0.25), 0 8px 40px -12px hsl(var(--accent) / 0.35);
+  /* Hero stat figure — the large number in a REWARDS/ENTRIES-style cell.
+   * Tabular so counting up doesn't jitter the baseline. */
+  .stat {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(26px, 3.4vw, 34px);
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Flat card: border only, no shadow — the two are never combined. */
+  .card {
+    background: hsl(var(--panel));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+  }
+
+  .hairline {
+    border-top: 1px solid hsl(var(--border));
+  }
 }
 
 :focus-visible {
   outline: 2px solid hsl(var(--accent));
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -123,7 +117,7 @@ body {
   height: 8px;
 }
 .scroll-thin::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: hsl(var(--border-strong));
   border-radius: 8px;
 }
 .scroll-thin::-webkit-scrollbar-thumb:hover {
