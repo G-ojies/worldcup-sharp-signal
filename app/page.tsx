@@ -14,7 +14,8 @@
 
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { ArrowUpRight, Check, Loader2, Play, TriangleAlert, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { ProbabilityChart } from "./components/ProbabilityChart";
 import { PipelineStages } from "./components/PipelineStages";
 import { AnimatedNumber, Reveal, SPRING } from "./components/motion";
@@ -259,23 +260,30 @@ function HeroBanner({ run, runState, live }: { run: RunResponse | null; runState
 
   return (
     <section className="relative overflow-hidden rounded-card border border-border bg-panel">
-      {/* Layer order matters: wash sits behind the ghost type, scrim over both.
-       * The ghost is anchored right so the scrim's opaque end never eats it. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_140%_at_100%_0%,hsl(var(--accent)/0.28),transparent_60%)]"
+      {/* Layer order: photo → violet wash → scrim. The scrim is what guarantees
+       * the heading clears AA over a bright, busy floodlit crowd. */}
+      <Image
+        src="/hero-stadium.jpg"
+        alt=""
+        fill
+        priority
+        sizes="(max-width: 1200px) 100vw, 1136px"
+        className="pointer-events-none select-none object-cover object-[70%_center] opacity-75"
       />
-      {/* Ghosted display wordmark — the hero's only "artwork", clipped by the card. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-5 -top-8 select-none text-[120px] font-bold leading-none tracking-tighter text-fg/[0.07] sm:-top-12 sm:text-[190px]"
-      >
-        STEAM
-      </span>
-      {/* Scrim: guarantees text contrast over the wash and the ghost type. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,hsl(var(--panel))_26%,hsl(var(--panel)/0.76)_58%,hsl(var(--panel)/0.25))]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_140%_at_100%_0%,hsl(var(--accent)/0.34),transparent_62%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,hsl(var(--panel))_24%,hsl(var(--panel)/0.82)_54%,hsl(var(--panel)/0.42))]"
+      />
+      {/* Vertical scrim: the stat row's 10px muted labels measured 3.0:1 against
+       * the floodlit crowd (needs 4.5). This lands them on near-solid panel and
+       * incidentally mutes the busiest, noisiest part of the photo. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--panel))_20%,hsl(var(--panel)/0.72)_40%,transparent_72%)]"
       />
 
       <div className="relative p-5 sm:p-8">
@@ -295,8 +303,8 @@ function HeroBanner({ run, runState, live }: { run: RunResponse | null; runState
         </h2>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
           {run
-            ? `Replaying ${run.meta.home} v ${run.meta.away} — real recorded StablePrice odds, streamed through the live agent.`
-            : "Replay a finished World Cup match — real recorded odds streamed through the live agent, every signal proof-checked on Solana."}
+            ? `Replaying ${run.meta.home} v ${run.meta.away} on real recorded StablePrice odds, streamed through the live agent.`
+            : "Replay a finished World Cup match on real recorded odds, streamed through the live agent with every signal proof-checked on Solana."}
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2">
@@ -328,7 +336,7 @@ function HeroBanner({ run, runState, live }: { run: RunResponse | null; runState
           <Stat label="Final" sub={run ? `${run.meta.home} v ${run.meta.away}` : "full time"}>
             {run && done ? (
               <span className="stat">
-                {run.meta.finalHome}–{run.meta.finalAway}
+                {run.meta.finalHome}-{run.meta.finalAway}
               </span>
             ) : (
               <Dash />
@@ -480,13 +488,46 @@ function ErrorState({ msg, onRun }: { msg: string; onRun: () => void }) {
 }
 
 /* ─────────────────────────── badges ─────────────────────────── */
-const PROOF: Record<string, { label: string; cls: string; icon: typeof Check }> = {
-  verified: { label: "on-chain verified", cls: "text-pos border-pos/30 bg-pos/10", icon: Check },
-  mock: { label: "verified", cls: "text-pos border-pos/30 bg-pos/10", icon: Check },
-  rejected: { label: "proof rejected", cls: "text-neg border-neg/30 bg-neg/10", icon: X },
-  unanchored: { label: "root pending", cls: "text-warn border-warn/30 bg-warn/10", icon: TriangleAlert },
-  unavailable: { label: "proof unavailable", cls: "text-warn border-warn/30 bg-warn/10", icon: TriangleAlert },
-  error: { label: "verify error", cls: "text-warn border-warn/30 bg-warn/10", icon: TriangleAlert },
+/* `hint` matters most for `unanchored`: an amber badge reads as a failure, but a
+ * pending root is the expected devnet state (see SHARP_VERIFY_POLICY=advisory in
+ * .env.example) — not a proof that failed. The tooltip says so. */
+const PROOF: Record<string, { label: string; cls: string; icon: typeof Check; hint: string }> = {
+  verified: {
+    label: "on-chain verified",
+    cls: "text-pos border-pos/30 bg-pos/10",
+    icon: Check,
+    hint: "TxLINE's Merkle proof was checked against the odds root anchored on Solana. The agent opened this position on confirmed data.",
+  },
+  mock: {
+    label: "verified",
+    cls: "text-pos border-pos/30 bg-pos/10",
+    icon: Check,
+    hint: "Proof check passed against a stubbed verifier. No chain hop was made.",
+  },
+  rejected: {
+    label: "proof rejected",
+    cls: "text-neg border-neg/30 bg-neg/10",
+    icon: X,
+    hint: "The odds update didn't match the anchored root, so the agent refused to trade this signal.",
+  },
+  unanchored: {
+    label: "root pending",
+    cls: "text-warn border-warn/30 bg-warn/10",
+    icon: TriangleAlert,
+    hint: "Not a failed proof. TxLINE hasn't anchored this odds root on devnet yet, so validate_odds has nothing to check it against. The advisory policy opens the position and flags it; a strict policy would drop the signal instead.",
+  },
+  unavailable: {
+    label: "proof unavailable",
+    cls: "text-warn border-warn/30 bg-warn/10",
+    icon: TriangleAlert,
+    hint: "TxLINE returned no Merkle proof for this update, so there was nothing to verify against the root.",
+  },
+  error: {
+    label: "verify error",
+    cls: "text-warn border-warn/30 bg-warn/10",
+    icon: TriangleAlert,
+    hint: "The proof check itself failed (network or RPC). The signal is flagged rather than silently trusted.",
+  },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -494,10 +535,12 @@ function StatusBadge({ status }: { status: string }) {
   if (!p) return <span className="rounded-full border border-border-strong px-2 py-0.5 text-[10px] text-muted">{status}</span>;
   const Icon = p.icon;
   return (
-    <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-medium ${p.cls}`}>
-      <Icon className="h-3 w-3" aria-hidden />
-      {p.label}
-    </span>
+    <Tooltip hint={p.hint}>
+      <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-medium ${p.cls}`}>
+        <Icon className="h-3 w-3" aria-hidden />
+        {p.label}
+      </span>
+    </Tooltip>
   );
 }
 
@@ -505,6 +548,54 @@ function statusBar(status: string): string {
   if (status === "verified" || status === "mock") return "border-l-pos";
   if (status === "rejected") return "border-l-neg";
   return "border-l-warn";
+}
+
+/**
+ * Small hint tooltip. The trigger is a real <button> so it's tab-reachable and
+ * tappable, not hover-only — on touch there is no hover, and these badges are
+ * the only place the proof status is explained.
+ *
+ * Hover is gated on pointerType === "mouse": a tap fires pointerenter *and*
+ * click, which would otherwise open then immediately toggle it shut.
+ */
+function Tooltip({ hint, children }: { hint: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const pointerType = useRef("mouse");
+  const id = useId();
+  return (
+    <span className="relative inline-flex">
+      <button
+        type="button"
+        aria-describedby={open ? id : undefined}
+        /* Each input path owns one trigger, so they can't fight:
+         *  mouse    → pointerenter/leave (click ignored, it's already showing)
+         *  keyboard → focus, but only a real :focus-visible focus
+         *  touch    → click toggles; tap-focus is NOT focus-visible, so the
+         *             pointerdown→focus→click sequence can't open-then-close. */
+        onPointerDown={(e) => (pointerType.current = e.pointerType)}
+        onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
+        onPointerLeave={(e) => e.pointerType === "mouse" && setOpen(false)}
+        onFocus={(e) => e.target.matches(":focus-visible") && setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onClick={() => pointerType.current !== "mouse" && setOpen((o) => !o)}
+        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+        /* ::before widens the touch target to ~40px without altering layout —
+         * the badge itself is only ~18px tall. */
+        className="relative cursor-help rounded-full before:absolute before:-inset-x-2 before:-inset-y-[11px] before:content-['']"
+      >
+        {children}
+      </button>
+      {open && (
+        <span
+          role="tooltip"
+          id={id}
+          className="absolute bottom-full right-0 z-30 mb-2 w-56 rounded-control border border-border-strong bg-panel-2 px-3 py-2 text-left text-[11px] font-normal leading-relaxed text-fg"
+        >
+          {hint}
+        </span>
+      )}
+    </span>
+  );
 }
 
 /* ─────────────────────────── signal tape ─────────────────────────── */
@@ -518,7 +609,7 @@ function SignalTape({ run, revealed }: { run: RunResponse | null; revealed: RunE
         <span className="label">{sigs.length} detected</span>
       </div>
       {sigs.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted">Watching the feed — no steam yet.</p>
+        <p className="py-8 text-center text-sm text-muted">Watching the feed. No steam yet.</p>
       ) : (
         <ul className="space-y-2">
           <AnimatePresence initial={false}>
@@ -748,9 +839,33 @@ function Footer() {
           Solana <code className="tnum">validate_odds</code> · devnet
         </span>
       </div>
-      <p className="max-w-md text-[11px] leading-relaxed text-muted">
-        Odds are a recorded real feed; live fixtures and proof checks are fetched live.
-      </p>
+      <div className="max-w-md space-y-1">
+        <p className="text-[11px] leading-relaxed text-muted">
+          Odds are a recorded real feed; live fixtures and proof checks are fetched live.
+        </p>
+        {/* CC BY 4.0 requires attribution to the photographer plus a licence link. */}
+        <p className="text-[11px] leading-relaxed text-muted">
+          Banner photo by Krzysztof Popławski,{" "}
+          <a
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2 transition-colors duration-100 ease-out hover:text-fg"
+          >
+            CC BY 4.0
+          </a>
+          , via{" "}
+          <a
+            href="https://commons.wikimedia.org/wiki/File:Mecz_pi%C5%82karski_Wis%C5%82a_Krak%C3%B3w_-_Zag%C5%82%C4%99bie_Sosnwoiec,_28_pa%C5%BAdziernika_2022,_Po%C5%BCegnanie_Stadionu_Ludowego,_KP.jpg"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2 transition-colors duration-100 ease-out hover:text-fg"
+          >
+            Wikimedia Commons
+          </a>
+          .
+        </p>
+      </div>
     </footer>
   );
 }

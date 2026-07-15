@@ -4,7 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GreYat SharpSignal — autonomous steam-move agent",
+  title: "GreYat SharpSignal: autonomous steam-move agent",
   description:
     "Autonomous, proof-grounded sharp-money detector for the 2026 World Cup, powered by the TxLINE StablePrice feed and verified on Solana.",
 };
