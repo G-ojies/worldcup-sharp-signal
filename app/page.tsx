@@ -752,8 +752,9 @@ function LiveFixtures() {
   const [rows, setRows] = useState<FixtureRow[]>([]);
   const [err, setErr] = useState("");
 
-  const load = useCallback(async () => {
-    setState("loading");
+  // silent=true for background polls so the panel doesn't flash its skeleton.
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setState("loading");
     try {
       const res = await fetch("/api/fixtures", { cache: "no-store" });
       const data = await res.json();
@@ -762,12 +763,15 @@ function LiveFixtures() {
       setState("ok");
     } catch (e) {
       setErr((e as Error).message);
-      setState("error");
+      if (!silent) setState("error");
     }
   }, []);
 
+  // Load once, then poll every 30s so the live fixtures list stays current.
   useEffect(() => {
     void load();
+    const id = setInterval(() => void load(true), 30_000);
+    return () => clearInterval(id);
   }, [load]);
 
   return (
@@ -794,7 +798,7 @@ function LiveFixtures() {
           <p className="mt-1 text-[11px] text-muted">{err}</p>
           <button
             type="button"
-            onClick={load}
+            onClick={() => load()}
             className="mt-3 inline-flex h-9 items-center rounded-full border border-border-strong px-3 text-xs transition-colors duration-100 ease-out hover:bg-panel-2"
           >
             Retry
